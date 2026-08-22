@@ -61,6 +61,7 @@ class AbsensiController
             jsonError('Anda sudah melakukan check-in hari ini', 409);
         }
 
+        $fotoPath = null;
         if (is_string($fotoBase64) && $fotoBase64 !== '') {
             $fotoPath = $this->simpanFotoBukti($authUser['nik'], $fotoBase64);
 
