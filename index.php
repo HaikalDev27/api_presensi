@@ -66,6 +66,7 @@ require_once __DIR__ . '/controllers/AuthController.php';
 require_once __DIR__ . '/controllers/AbsensiController.php';
 require_once __DIR__ . '/controllers/WajahController.php';
 require_once __DIR__ . '/controllers/VersionController.php';
+require_once __DIR__ . '/controllers/NotifikasiController.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -96,6 +97,8 @@ $routes = [
     'POST /api/auth/login'           => [AuthController::class, 'login'], //Login
     'GET /api/auth/me'               => [AuthController::class, 'me'], //Profil
     'PUT /api/auth/change-password'  => [AuthController::class, 'changePassword'], //Ganti Password
+    'POST /api/auth/signup'          => [AuthController::class, 'signUp'], //Daftar akun baru
+    'POST /api/auth/check-nik'       => [AuthController::class, 'checkNik'],
 
     'POST /api/auth/forgot-password/verify' => [AuthController::class, 'forgotPasswordVerify'], //Lupa password: verifikasi wajah
     'PUT /api/auth/forgot-password/reset'   => [AuthController::class, 'forgotPasswordReset'], //Lupa password: set password baru
@@ -111,7 +114,13 @@ $routes = [
 
     'GET /api/absensi/batas-waktu'   => [AbsensiController::class, 'batasWaktu'], //Ambil batas waktu absensi
 
-    'GET /api/app-version'           => [AppVersionController::class, 'getVersion'] //Ambil informasi versi aplikasi
+    'GET /api/app-version'           => [AppVersionController::class, 'getVersion'], //Ambil informasi versi aplikasi
+    'GET /api/absensi/lokasi' => [AbsensiController::class, 'daftarLokasi'],
+
+    'POST /api/notifikasi/device-token' => [NotifikasiController::class, 'simpanToken'],
+
+    'PUT /api/absensi/lokasi-rumah' => [AbsensiController::class, 'aturLokasiRumah'],
+    'GET /api/absensi/lokasi-rumah' => [AbsensiController::class, 'getLokasiRumah'],
 ];
 
 $routeKey = $method . ' ' . $path;

@@ -1,6 +1,7 @@
 # Folder ini HANYA untuk menyimpan foto bukti absensi (gambar statis).
 # Blokir eksekusi script apa pun di sini, untuk jaga-jaga kalau ada
 # file berbahaya yang lolos validasi ekstensi di kode PHP.
+Options -Indexes
 
 <FilesMatch "\.(php|phtml|php3|php4|php5|pl|py|jsp|asp|sh|cgi)$">
     Require all denied

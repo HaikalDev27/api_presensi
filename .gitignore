@@ -3,3 +3,5 @@
 /vendor/
 
 /uploads/
+
+/config/firebase-service-account.json

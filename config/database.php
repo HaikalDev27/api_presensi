@@ -2,13 +2,32 @@
 
 declare(strict_types=1);
 
-const DB_HOST = 'localhost';
-const DB_NAME = 'db_bekah_presensi';
-const DB_USER = 'root';
-const DB_PASS = '$Berkah_App#26#';
-const DB_CHARSET = 'utf8mb4';
+require_once __DIR__ . '/../vendor/autoload.php'; 
 
-$dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=' . DB_CHARSET;
+use Dotenv\Dotenv;
+
+try {
+    $dotenv = Dotenv::createImmutable(dirname(__DIR__)); 
+    $dotenv->load();
+} catch (Exception $e) {
+    error_log('Failed to load .env file: ' . $e->getMessage());
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'message' => 'Gagal memuat konfigurasi. Silakan coba lagi nanti.',
+        'data'    => null,
+    ]);
+    exit;
+}
+
+$DB_HOST = 'localhost';
+$DB_NAME = $_ENV['DB_NAME'] ?? '';
+$DB_USER = $_ENV['DB_USN'] ?? '';
+$DB_PASS = $_ENV['DB_PWD'] ?? '';
+$DB_CHARSET = 'utf8mb4';
+
+$dsn = 'mysql:host=' . $DB_HOST . ';dbname=' . $DB_NAME . ';charset=' . $DB_CHARSET;
 
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -17,7 +36,7 @@ $options = [
 ];
 
 try {
-    $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+    $pdo = new PDO($dsn, $DB_USER, $DB_PASS, $options);
 } catch (PDOException $e) {
     error_log('Database connection failed: ' . $e->getMessage());
 

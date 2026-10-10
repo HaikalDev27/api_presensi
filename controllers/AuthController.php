@@ -343,4 +343,89 @@ class AuthController
 
         jsonSuccess('Password berhasil direset. Silakan login dengan password baru Anda.');
     }
+
+    public function signUp(): void
+    {
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        if(!is_array($input)) {
+            jsonError('Body request tidak valid (harus JSON)', 400);
+        }
+
+        $nik = trim((string) ($input['nik'] ?? ''));
+        $username = trim((string) ($input['username'] ?? ''));
+        $password = (string) ($input['password'] ?? '');
+
+        if ($nik === '' || $username === '' || $password === '') {
+            jsonError('NIK, username, dan password wajib diisi', 400);
+        }
+
+        if (strlen($password) < 6) {
+            jsonError('Password minimal 6 karakter', 400);
+        }
+
+        $pdo = require __DIR__ . '/../config/database.php';
+
+        $stmt = $pdo->prepare('SELECT nik, status_aktif FROM karyawan WHERE nik = ?');
+        $stmt->execute([$nik]);
+        $karyawan = $stmt->fetch();
+
+        if ($karyawan === false) {
+            jsonError('NIK tidak ditemukan di tabel karyawan, hubungi admin/HR', 404);
+        }
+
+        if ($karyawan['status_aktif'] !== 'Aktif') {
+            jsonError('Akun tidak aktif. Silakan hubungi admin', 403);
+        }
+
+        $stmt = $pdo->prepare('SELECT id_user FROM login WHERE username = ?');
+        $stmt->execute([$username]);
+        if ($stmt->fetch() !== false) {
+            jsonError('Username sudah digunakan, silakan pilih username lain', 409);
+        }
+
+        $newHash = password_hash($password, PASSWORD_DEFAULT);
+        $insertStmt = $pdo->prepare('INSERT INTO login (password, username, activity, nik, hak_akses)
+            VALUES (?, ?, ?, ?, ?)');
+        $insertStmt->execute([$newHash, $username, 'off', $nik, 'user']);
+
+        jsonSuccess('Akun berhasil dibuat. Silakan login dengan username dan password Anda.', null, 201);
+    }
+
+    public function checkNik(): void
+    {
+        $input = json_decode(file_get_contents('php://input'), true);
+    
+        if (!is_array($input)) {
+            jsonError('Body request tidak valid (harus JSON)', 400);
+        }
+    
+        $nik = trim((string) ($input['nik'] ?? ''));
+    
+        if ($nik === '') {
+            jsonError('NIK wajib diisi', 400);
+        }
+    
+        $pdo = require __DIR__ . '/../config/database.php';
+    
+        $stmt = $pdo->prepare('SELECT nik, nama, status_aktif FROM karyawan WHERE nik = ?');
+        $stmt->execute([$nik]);
+        $karyawan = $stmt->fetch();
+    
+        if ($karyawan === false) {
+            jsonError('NIK tidak ditemukan di tabel karyawan, hubungi admin/HR', 404);
+        }
+    
+        if ($karyawan['status_aktif'] !== 'Aktif') {
+            jsonError('Akun tidak aktif. Silakan hubungi admin', 403);
+        }
+    
+        $stmt = $pdo->prepare('SELECT id_user FROM login WHERE nik = ?');
+        $stmt->execute([$nik]);
+        if ($stmt->fetch() !== false) {
+            jsonError('NIK ini sudah memiliki akun, silakan langsung login', 409);
+        }
+    
+        jsonSuccess('NIK ditemukan', ['nama' => $karyawan['nama']], 200);
+    }
 }

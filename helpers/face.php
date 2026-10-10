@@ -18,7 +18,7 @@ const FACE_EMBEDDING_LENGTH = 192;
 
 // Ambang batas cosine similarity untuk dianggap "cocok".
 // 1.0 = identik sempurna, 0.0 = tidak mirip sama sekali.
-const FACE_MATCH_THRESHOLD = 0.6;
+const FACE_MATCH_THRESHOLD = 0.8;
 
 // Validasi bentuk embedding: harus array angka sepanjang FACE_EMBEDDING_LENGTH
 function validasiEmbedding($embedding): ?string
